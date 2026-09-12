@@ -12,7 +12,7 @@ console = Console()
 @app.command()
 def audit():
     """Run a cloud infrastructure audit."""
-    console.print("[green]Starting cloud infrastructure audit...[/green]")
+    console.print("Starting cloud infrastructure audit...")
 
 
 @app.command()

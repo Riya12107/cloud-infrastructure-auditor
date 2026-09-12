@@ -1,90 +1,38 @@
-\# Cloud Infrastructure Auditor
+# Cloud Infrastructure Auditor & Cost Optimizer
 
+## Objective
 
+A CLI tool that audits cloud infrastructure, identifies
+unused or underutilized resources, estimates potential savings,
+and provides safe cleanup commands.
 
-A Python CLI application for auditing cloud infrastructure and
+## Technology Stack
 
-identifying unused or underutilized resources for cost optimization.
+- Python
+- Typer
+- Rich
+- Boto3
+- PyYAML
+- Python-dotenv
+- Pytest
+- Moto
+- PyInstaller
 
+## Current Progress
 
+Day 1:
+- Project structure created
+- Git repository configured
+- Configuration system created
+- Typer CLI created
+- Audit command created
+- Version command created
+- Initial unit tests created
 
-\## Project Objective
+## CLI Commands
 
+python -m src.cli.main --help
 
+python -m src.cli.main version
 
-The application audits cloud infrastructure, identifies unused or
-
-underutilized resources, reports potential savings, and provides
-
-safe cleanup operations.
-
-
-
-\## Technology Stack
-
-
-
-\- Python
-
-\- Typer
-
-\- Rich
-
-\- Boto3
-
-\- PyYAML
-
-\- JSON
-
-\- Python Dotenv
-
-
-
-\## Project Structure
-
-
-
-```text
-
-cloud-infrastructure-auditor/
-
-│
-
-├── src/
-
-│   ├── cli/
-
-│   ├── auth/
-
-│   ├── scanners/
-
-│   ├── reports/
-
-│   ├── cleanup/
-
-│   ├── config/
-
-│   └── utils/
-
-│
-
-├── tests/
-
-│   ├── unit/
-
-│   └── integration/
-
-│
-
-├── docs/
-
-│
-
-├── README.md
-
-├── requirements.txt
-
-├── .env.example
-
-└── .gitignore
-
+python -m src.cli.main audit
