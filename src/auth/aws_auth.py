@@ -23,6 +23,19 @@ def create_aws_session():
     )
 
 
+def get_aws_session_info():
+    """
+    Return non-sensitive information about the current AWS session.
+    """
+
+    session = create_aws_session()
+
+    return {
+        "profile": session.profile_name or "default",
+        "region": session.region_name,
+    }
+
+
 def get_aws_client(service_name: str):
     """
     Create a boto3 client for the requested AWS service.
