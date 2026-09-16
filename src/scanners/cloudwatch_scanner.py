@@ -1,4 +1,5 @@
 from src.scanners.base_scanner import BaseScanner
+from src.utils.aws_helpers import call_aws_api
 
 
 class CloudWatchScanner(BaseScanner):
@@ -24,6 +25,21 @@ class CloudWatchScanner(BaseScanner):
         in Week 2.
         """
         return []
+
+    def fetch_metric_statistics(
+        self,
+        cloudwatch_client,
+        **kwargs,
+    ) -> dict:
+        """
+        Fetch CloudWatch metric statistics through the shared
+        AWS API retry and rate-limit handler.
+        """
+
+        return call_aws_api(
+            cloudwatch_client.get_metric_statistics,
+            **kwargs,
+        )
 
     def build_metric(
         self,

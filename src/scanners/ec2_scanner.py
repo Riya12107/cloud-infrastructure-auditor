@@ -1,4 +1,5 @@
 from src.scanners.base_scanner import BaseScanner
+from src.utils.aws_helpers import call_aws_api
 
 
 class EC2Scanner(BaseScanner):
@@ -20,9 +21,20 @@ class EC2Scanner(BaseScanner):
         """
         Scan AWS EC2 instances.
 
-        Actual AWS scanning will be implemented in Week 2.
+        Actual AWS resource scanning will be implemented
+        in Week 2.
         """
         return []
+
+    def fetch_instances(self, ec2_client) -> dict:
+        """
+        Fetch EC2 instance information through the shared
+        AWS API retry and rate-limit handler.
+        """
+
+        return call_aws_api(
+            ec2_client.describe_instances
+        )
 
     def build_finding(
         self,
