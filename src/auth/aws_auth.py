@@ -15,17 +15,18 @@ def create_aws_session():
     if AWS_PROFILE:
         return boto3.Session(
             profile_name=AWS_PROFILE,
-            region_name=AWS_REGION
+            region_name=AWS_REGION,
         )
 
     return boto3.Session(
-        region_name=AWS_REGION
+        region_name=AWS_REGION,
     )
 
 
 def get_aws_session_info():
     """
-    Return non-sensitive information about the current AWS session.
+    Return non-sensitive information about
+    the current AWS session.
     """
 
     session = create_aws_session()
@@ -46,6 +47,19 @@ def get_aws_client(service_name: str):
     return session.client(service_name)
 
 
+def get_aws_resource(service_name: str):
+    """
+    Create a boto3 resource for the requested AWS service.
+
+    This is useful for services where the boto3 resource
+    interface is convenient.
+    """
+
+    session = create_aws_session()
+
+    return session.resource(service_name)
+
+
 def validate_aws_credentials():
     """
     Validate the currently configured AWS credentials.
@@ -57,6 +71,7 @@ def validate_aws_credentials():
 
     try:
         session = create_aws_session()
+
         sts_client = session.client("sts")
 
         identity = sts_client.get_caller_identity()
