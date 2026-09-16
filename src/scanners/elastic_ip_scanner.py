@@ -1,4 +1,5 @@
 from src.scanners.base_scanner import BaseScanner
+from src.utils.aws_helpers import call_aws_api
 
 
 class ElasticIPScanner(BaseScanner):
@@ -19,9 +20,20 @@ class ElasticIPScanner(BaseScanner):
         """
         Scan AWS Elastic IP addresses.
 
-        Actual AWS scanning will be implemented in Week 2.
+        Actual AWS resource scanning will be implemented
+        in Week 2.
         """
         return []
+
+    def fetch_addresses(self, ec2_client) -> dict:
+        """
+        Fetch Elastic IP information through the shared
+        AWS API retry and rate-limit handler.
+        """
+
+        return call_aws_api(
+            ec2_client.describe_addresses
+        )
 
     def build_finding(
         self,
