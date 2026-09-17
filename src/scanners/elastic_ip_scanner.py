@@ -1,10 +1,10 @@
 from src.scanners.base_scanner import BaseScanner
-from src.utils.aws_helpers import call_aws_api
+from src.utils.aws_helpers import call_aws_api, create_aws_client
 
 
 class ElasticIPScanner(BaseScanner):
     """
-    Scanner interface for AWS Elastic IP addresses.
+    Scanner for AWS Elastic IP addresses.
     """
 
     RESULT_FIELDS = [
@@ -18,12 +18,33 @@ class ElasticIPScanner(BaseScanner):
 
     def scan(self) -> list[dict]:
         """
-        Scan AWS Elastic IP addresses.
-
-        Actual AWS resource scanning will be implemented
-        in Week 2.
+        Scan AWS Elastic IP addresses and identify
+        unassociated Elastic IPs.
         """
-        return []
+
+        ec2_client = create_aws_client("ec2")
+
+        response = self.fetch_addresses(ec2_client)
+
+        findings = []
+
+        for address in response.get("Addresses", []):
+            allocation_id = address.get("AllocationId")
+
+            # An Elastic IP without an AssociationId
+            # is currently not associated with a resource.
+            if not address.get("AssociationId"):
+                findings.append(
+                    self.build_finding(
+                        resource_id=allocation_id,
+                        region=ec2_client.meta.region_name,
+                        status="unused",
+                        reason="Elastic IP is unassociated",
+                        cleanup_action="Review and release if no longer required",
+                    )
+                )
+
+        return findings
 
     def fetch_addresses(self, ec2_client) -> dict:
         """
