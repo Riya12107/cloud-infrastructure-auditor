@@ -1,3 +1,4 @@
+from unittest.mock import Mock, patch
 from unittest.mock import Mock
 
 from src.scanners.cloudwatch_scanner import CloudWatchScanner
@@ -84,3 +85,60 @@ def test_cloudwatch_scanner_build_metric():
     assert result["metric_name"] == "CPUUtilization"
     assert result["metric_value"] == 8.5
     assert result["period"] == "7 days"
+def test_cloudwatch_scanner_detects_underutilized_instance():
+    scanner = CloudWatchScanner(
+        instance_ids=["i-underutilized123", "i-normal123"]
+    )
+
+    mock_client = Mock()
+    mock_client.meta.region_name = "us-east-1"
+
+    with patch(
+        "src.scanners.cloudwatch_scanner.create_aws_client",
+        return_value=mock_client,
+    ), patch.object(
+        scanner,
+        "get_cpu_utilization",
+        side_effect=[2.5, 25.0],
+    ):
+        result = scanner.scan()
+
+    assert len(result) == 1
+    assert result[0]["resource_type"] == "CloudWatch"
+    assert result[0]["resource_id"] == "i-underutilized123"
+    assert result[0]["region"] == "us-east-1"
+    assert result[0]["metric_name"] == "CPUUtilization"
+    assert result[0]["metric_value"] == 2.5
+    assert result[0]["period"] == "14 days"
+    assert "5%" in result[0]["reason"]
+
+
+def test_cloudwatch_scanner_returns_empty_without_instances():
+    scanner = CloudWatchScanner()
+
+    result = scanner.scan()
+
+    assert result == []
+
+
+def test_cloudwatch_scanner_calculates_cpu_average():
+    scanner = CloudWatchScanner()
+
+    mock_client = Mock()
+
+    mock_client.get_metric_statistics.return_value = {
+        "Datapoints": [
+            {"Average": 2.0},
+            {"Average": 4.0},
+            {"Average": 6.0},
+        ]
+    }
+
+    result = scanner.get_cpu_utilization(
+        mock_client,
+        "i-test123",
+    )
+
+    assert result == 4.0
+
+    mock_client.get_metric_statistics.assert_called_once()
