@@ -1,10 +1,10 @@
 from src.scanners.base_scanner import BaseScanner
-from src.utils.aws_helpers import call_aws_api
+from src.utils.aws_helpers import call_aws_api, create_aws_client
 
 
 class EBSScanner(BaseScanner):
     """
-    Scanner interface for AWS EBS volumes.
+    Scanner for AWS EBS volumes.
     """
 
     RESULT_FIELDS = [
@@ -18,12 +18,31 @@ class EBSScanner(BaseScanner):
 
     def scan(self) -> list[dict]:
         """
-        Scan AWS EBS volumes.
-
-        Actual AWS resource scanning will be implemented
-        in Week 2.
+        Scan AWS EBS volumes and identify unattached volumes.
         """
-        return []
+
+        ec2_client = create_aws_client("ec2")
+
+        response = self.fetch_volumes(ec2_client)
+
+        findings = []
+
+        for volume in response.get("Volumes", []):
+            volume_id = volume.get("VolumeId")
+            state = volume.get("State")
+
+            if state == "available":
+                findings.append(
+                    self.build_finding(
+                        resource_id=volume_id,
+                        region=ec2_client.meta.region_name,
+                        status="unused",
+                        reason="EBS volume is unattached",
+                        cleanup_action="Review and delete if no longer required",
+                    )
+                )
+
+        return findings
 
     def fetch_volumes(self, ec2_client) -> dict:
         """
