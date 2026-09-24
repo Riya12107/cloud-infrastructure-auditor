@@ -1,2 +1,5 @@
 provider: aws
 region: ap-south-1
+
+thresholds:
+  ec2_cpu: 10
