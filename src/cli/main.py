@@ -2,14 +2,18 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from src.auth.aws_auth import get_aws_session_info, validate_aws_credentials
+from src.auth.aws_auth import (
+    get_aws_session_info,
+    validate_aws_credentials,
+)
 from src.config.settings import AWS_PROFILE, AWS_REGION
+from src.reports.terminal_report import display_findings
 from src.scanners.scanner_manager import ScannerManager
 
 
 app = typer.Typer(
     name="cloud-auditor",
-    help="Cloud Infrastructure Auditor & Cost Optimizer"
+    help="Cloud Infrastructure Auditor & Cost Optimizer",
 )
 
 console = Console()
@@ -23,15 +27,19 @@ def audit():
         "[bold]Starting cloud infrastructure audit...[/bold]"
     )
 
-    console.print("Checking AWS authentication...")
+    console.print(
+        "Checking AWS authentication..."
+    )
 
     if not validate_aws_credentials():
         console.print(
             "[red]AWS authentication failed.[/red]"
         )
+
         console.print(
             "Please check your AWS credentials and configuration."
         )
+
         raise typer.Exit(code=1)
 
     session_info = get_aws_session_info()
@@ -39,9 +47,11 @@ def audit():
     console.print(
         "[green]AWS authentication successful.[/green]"
     )
+
     console.print(
         f"Profile: {session_info['profile']}"
     )
+
     console.print(
         f"Region: {session_info['region']}"
     )
@@ -58,6 +68,10 @@ def audit():
         "[green]Infrastructure scan completed.[/green]"
     )
 
+    # Display detailed findings using Rich
+    display_findings(findings)
+
+    # Display audit summary
     summary_table = Table(
         title="Audit Summary"
     )
@@ -67,7 +81,7 @@ def audit():
 
     summary_table.add_row(
         "Total findings",
-        str(len(findings))
+        str(len(findings)),
     )
 
     ebs_count = sum(
@@ -90,17 +104,17 @@ def audit():
 
     summary_table.add_row(
         "EBS findings",
-        str(ebs_count)
+        str(ebs_count),
     )
 
     summary_table.add_row(
         "Elastic IP findings",
-        str(elastic_ip_count)
+        str(elastic_ip_count),
     )
 
     summary_table.add_row(
         "EC2 findings",
-        str(ec2_count)
+        str(ec2_count),
     )
 
     console.print(summary_table)
@@ -119,19 +133,21 @@ def version():
 def config():
     """Display current cloud auditor configuration."""
 
-    table = Table(title="Cloud Auditor Configuration")
+    table = Table(
+        title="Cloud Auditor Configuration"
+    )
 
     table.add_column("Setting")
     table.add_column("Value")
 
     table.add_row(
         "AWS Profile",
-        AWS_PROFILE or "Default credential chain"
+        AWS_PROFILE or "Default credential chain",
     )
 
     table.add_row(
         "AWS Region",
-        AWS_REGION
+        AWS_REGION,
     )
 
     console.print(table)
