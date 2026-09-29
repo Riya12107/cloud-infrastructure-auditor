@@ -14,18 +14,46 @@ def display_findings(findings: list[dict]) -> None:
     """
 
     table = Table(
-        title="Cloud Infrastructure Audit Findings"
+        title="Cloud Infrastructure Audit Findings",
+        show_header=True,
+        header_style="bold",
+        show_lines=True,
     )
 
-    table.add_column("Resource Type")
-    table.add_column("Resource ID")
-    table.add_column("Region")
-    table.add_column("Status")
-    table.add_column("Reason")
-    table.add_column("Cleanup Action")
+    table.add_column(
+        "Resource Type",
+        no_wrap=True,
+    )
+
+    table.add_column(
+        "Resource ID",
+        no_wrap=True,
+    )
+
+    table.add_column(
+        "Region",
+        no_wrap=True,
+    )
+
+    table.add_column(
+        "Status",
+        no_wrap=True,
+    )
+
+    table.add_column(
+        "Reason",
+        overflow="fold",
+    )
+
+    table.add_column(
+        "Cleanup Action",
+        overflow="fold",
+    )
 
     if not findings:
-        console.print("[yellow]No audit findings found.[/yellow]")
+        console.print(
+            "[yellow]No audit findings found.[/yellow]"
+        )
         return
 
     for finding in findings:
