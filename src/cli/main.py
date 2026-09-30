@@ -8,6 +8,7 @@ from src.auth.aws_auth import (
 )
 from src.config.settings import AWS_PROFILE, AWS_REGION
 from src.reports.terminal_report import display_findings
+from src.reports.csv_report import export_findings_to_csv
 from src.scanners.scanner_manager import ScannerManager
 
 
@@ -70,6 +71,18 @@ def audit():
 
     # Display detailed findings using Rich
     display_findings(findings)
+
+    # Export findings to CSV
+    csv_output_path = "reports/audit_report.csv"
+
+    export_findings_to_csv(
+        findings,
+        csv_output_path,
+    )
+
+    console.print(
+        f"[green]CSV report exported to {csv_output_path}[/green]"
+    )
 
     # Display audit summary
     summary_table = Table(
