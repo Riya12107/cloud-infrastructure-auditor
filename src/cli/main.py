@@ -9,6 +9,7 @@ from src.auth.aws_auth import (
 from src.config.settings import AWS_PROFILE, AWS_REGION
 from src.reports.terminal_report import display_findings
 from src.reports.csv_report import export_findings_to_csv
+from src.reports.json_report import export_findings_to_json
 from src.scanners.scanner_manager import ScannerManager
 
 
@@ -82,6 +83,18 @@ def audit():
 
     console.print(
         f"[green]CSV report exported to {csv_output_path}[/green]"
+    )
+
+    # Export findings to JSON
+    json_output_path = "reports/audit_report.json"
+
+    export_findings_to_json(
+        findings,
+        json_output_path,
+    )
+
+    console.print(
+        f"[green]JSON report exported to {json_output_path}[/green]"
     )
 
     # Display audit summary
