@@ -1,6 +1,8 @@
 import typer
 from rich import print
+
 from utils.logger import get_logger
+from app.audit_engine import run_audit
 
 app = typer.Typer()
 logger = get_logger()
@@ -22,6 +24,23 @@ def info():
 @app.command()
 def version():
     print("Cloud Infrastructure Auditor version 1.0.0")
+
+
+@app.command()
+def audit():
+    """Run a cloud infrastructure audit."""
+    logger.info("Starting cloud infrastructure audit")
+
+    result = run_audit()
+
+    print("\n[bold blue]Cloud Infrastructure Audit[/bold blue]\n")
+
+    print("[bold]Resource Summary:[/bold]")
+
+    for resource_type, count in result["summary"].items():
+        print(f"  {resource_type}: {count}")
+
+    print("\n[bold green]Audit completed successfully.[/bold green]")
 
 
 if __name__ == "__main__":
