@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 
 
 @dataclass
@@ -9,3 +10,5 @@ class Finding:
     severity: str
     description: str
     recommendation: str
+    estimated_monthly_cost: Optional[float] = None
+    estimated_monthly_savings: Optional[float] = None

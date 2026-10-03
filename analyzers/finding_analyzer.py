@@ -1,9 +1,16 @@
 from models.finding import Finding
+from app.cost_estimator import (
+    estimate_monthly_cost,
+    estimate_monthly_savings,
+)
 
 
 def analyze_ebs_volume(volume):
     if volume.get("attached"):
         return None
+
+    monthly_cost = estimate_monthly_cost("ebs", volume)
+    monthly_savings = estimate_monthly_savings("ebs", volume)
 
     return Finding(
         resource_id=volume.get("volume_id"),
@@ -12,10 +19,17 @@ def analyze_ebs_volume(volume):
         severity="medium",
         description="The EBS volume is not attached to any EC2 instance.",
         recommendation="Review the volume and remove it if it is no longer required.",
+        estimated_monthly_cost=monthly_cost,
+        estimated_monthly_savings=monthly_savings,
     )
+
+
 def analyze_elastic_ip(address):
     if address.get("associated"):
         return None
+
+    monthly_cost = estimate_monthly_cost("elastic_ip", address)
+    monthly_savings = estimate_monthly_savings("elastic_ip", address)
 
     return Finding(
         resource_id=address.get("allocation_id"),
@@ -24,7 +38,11 @@ def analyze_elastic_ip(address):
         severity="medium",
         description="The Elastic IP is not associated with any resource.",
         recommendation="Release the Elastic IP if it is no longer required.",
+        estimated_monthly_cost=monthly_cost,
+        estimated_monthly_savings=monthly_savings,
     )
+
+
 def analyze_ec2_utilization(instance):
     average_cpu = instance.get("average_cpu")
 
@@ -41,6 +59,12 @@ def analyze_ec2_utilization(instance):
         resource_type="ec2",
         title="Underutilized EC2 instance",
         severity="low",
-        description=f"Average CPU utilization is {average_cpu}%, below the configured threshold of {threshold}%.",
-        recommendation="Review the instance and consider resizing or stopping it if it is no longer required.",
+        description=(
+            f"Average CPU utilization is {average_cpu}%, "
+            f"below the configured threshold of {threshold}%."
+        ),
+        recommendation=(
+            "Review the instance and consider resizing or stopping it "
+            "if it is no longer required."
+        ),
     )
