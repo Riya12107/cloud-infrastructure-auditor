@@ -7,6 +7,7 @@ from src.auth.aws_auth import (
     validate_aws_credentials,
 )
 from src.config.settings import AWS_PROFILE, AWS_REGION
+from src.cleanup.dry_run import display_dry_run
 from src.reports.terminal_report import display_findings
 from src.reports.csv_report import export_findings_to_csv
 from src.reports.json_report import export_findings_to_json
@@ -22,7 +23,13 @@ console = Console()
 
 
 @app.command()
-def audit():
+def audit(
+    dry_run: bool = typer.Option(
+        False,
+        "--dry-run",
+        help="Show proposed cleanup actions without modifying cloud resources.",
+    )
+):
     """Run a cloud infrastructure audit."""
 
     console.print(
@@ -70,10 +77,8 @@ def audit():
         "[green]Infrastructure scan completed.[/green]"
     )
 
-    # Display detailed findings using Rich
     display_findings(findings)
 
-    # Export findings to CSV
     csv_output_path = "reports/audit_report.csv"
 
     export_findings_to_csv(
@@ -85,7 +90,6 @@ def audit():
         f"[green]CSV report exported to {csv_output_path}[/green]"
     )
 
-    # Export findings to JSON
     json_output_path = "reports/audit_report.json"
 
     export_findings_to_json(
@@ -97,7 +101,17 @@ def audit():
         f"[green]JSON report exported to {json_output_path}[/green]"
     )
 
-    # Display audit summary
+    # ---------------------------------------------------------
+    # Week 3 Day 5 - Dry Run
+    # ---------------------------------------------------------
+
+    if dry_run:
+        display_dry_run(findings)
+
+    # ---------------------------------------------------------
+    # Audit Summary
+    # ---------------------------------------------------------
+
     summary_table = Table(
         title="Audit Summary"
     )
