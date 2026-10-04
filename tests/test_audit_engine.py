@@ -11,3 +11,4 @@ def test_run_audit_without_credentials():
     assert "ebs" in result["resources"]
     assert "elastic_ips" in result["resources"]
     assert "s3" in result["resources"]
+    assert isinstance(result["findings"], list)

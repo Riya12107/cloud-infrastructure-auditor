@@ -3,7 +3,7 @@ from rich import print
 
 from utils.logger import get_logger
 from app.audit_engine import run_audit
-
+from app.report import display_audit_report
 app = typer.Typer()
 logger = get_logger()
 
