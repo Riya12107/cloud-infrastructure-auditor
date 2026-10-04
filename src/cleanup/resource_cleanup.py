@@ -1,6 +1,7 @@
 from typing import Any
 
 from src.cleanup.validator import validate_cleanup_target
+from src.utils.aws_helpers import call_aws_api
 
 
 def release_elastic_ip(
@@ -8,11 +9,12 @@ def release_elastic_ip(
     allocation_id: str,
 ) -> dict[str, Any]:
     """
-    Release an Elastic IP address.
+    Release an Elastic IP address using the shared AWS API helper.
     """
 
-    ec2_client.release_address(
-        AllocationId=allocation_id
+    call_aws_api(
+        ec2_client.release_address,
+        AllocationId=allocation_id,
     )
 
     return {
@@ -28,11 +30,12 @@ def delete_ebs_volume(
     volume_id: str,
 ) -> dict[str, Any]:
     """
-    Delete an EBS volume.
+    Delete an EBS volume using the shared AWS API helper.
     """
 
-    ec2_client.delete_volume(
-        VolumeId=volume_id
+    call_aws_api(
+        ec2_client.delete_volume,
+        VolumeId=volume_id,
     )
 
     return {

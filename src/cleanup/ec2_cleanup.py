@@ -1,6 +1,7 @@
 from typing import Any
 
 from src.cleanup.ec2_validator import validate_ec2_cleanup_target
+from src.utils.aws_helpers import call_aws_api
 
 
 def terminate_ec2_instance(
@@ -8,11 +9,12 @@ def terminate_ec2_instance(
     instance_id: str,
 ) -> dict[str, Any]:
     """
-    Terminate an EC2 instance.
+    Terminate an EC2 instance using the shared AWS API helper.
     """
 
-    ec2_client.terminate_instances(
-        InstanceIds=[instance_id]
+    call_aws_api(
+        ec2_client.terminate_instances,
+        InstanceIds=[instance_id],
     )
 
     return {
