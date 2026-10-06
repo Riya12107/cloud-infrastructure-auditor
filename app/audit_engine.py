@@ -9,13 +9,44 @@ from analyzers.finding_analyzer import (
     analyze_ec2_utilization,
 )
 from scanners.ec2_scanner import get_cpu_utilizations
+
+from app.config_loader import load_config
+from scanners.gcp_compute_scanner import get_gcp_compute_instances
+
+
+
+
+
+
+
+
+
+
+
+
 def run_audit():
+    config = load_config()
+    provider = config.get("provider", "aws")
+
     resources = {
         "ec2": get_ec2_instances(),
         "ebs": get_ebs_volumes(),
         "elastic_ips": get_elastic_ips(),
         "s3": get_s3_buckets(),
     }
+
+    if provider == "gcp":
+        gcp_config = config.get("gcp", {})
+        project_id = gcp_config.get("project_id", "")
+        zone = gcp_config.get("zone", "")
+
+        if project_id and zone:
+            resources["gcp_compute"] = get_gcp_compute_instances(
+                project_id=project_id,
+                zone=zone,
+            )
+        else:
+            resources["gcp_compute"] = []
 
     findings = []
 

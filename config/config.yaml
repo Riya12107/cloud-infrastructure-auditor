@@ -1,5 +1,9 @@
 provider: aws
 region: ap-south-1
 
+gcp:
+  project_id: ""
+  zone: "asia-south1-a"
+
 thresholds:
   ec2_cpu: 10
