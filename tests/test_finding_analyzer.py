@@ -2,6 +2,7 @@ from analyzers.finding_analyzer import (
     analyze_ebs_volume,
     analyze_elastic_ip,
     analyze_ec2_utilization,
+    analyze_gcp_compute_instance,
 )
 
 
@@ -103,3 +104,25 @@ def test_ec2_without_cpu_data_has_no_finding():
     finding = analyze_ec2_utilization(instance)
 
     assert finding is None
+    
+def test_stopped_gcp_compute_instance_creates_finding():
+    from models.resource import CloudResource
+
+    instance = CloudResource(
+        provider="gcp",
+        resource_type="compute_instance",
+        resource_id="instance-test123",
+        details={
+            "machine_type": "e2-medium",
+            "status": "TERMINATED",
+            "zone": "asia-south1-a",
+        },
+    )
+
+    finding = analyze_gcp_compute_instance(instance)
+
+    assert finding is not None
+    assert finding.resource_id == "instance-test123"
+    assert finding.resource_type == "gcp_compute"
+    assert finding.title == "Stopped GCP Compute instance"
+    assert finding.severity == "medium"

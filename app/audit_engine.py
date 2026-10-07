@@ -7,22 +7,12 @@ from analyzers.finding_analyzer import (
     analyze_ebs_volume,
     analyze_elastic_ip,
     analyze_ec2_utilization,
+    analyze_gcp_compute_instance,
 )
 from scanners.ec2_scanner import get_cpu_utilizations
 
 from app.config_loader import load_config
 from scanners.gcp_compute_scanner import get_gcp_compute_instances
-
-
-
-
-
-
-
-
-
-
-
 
 def run_audit():
     config = load_config()
@@ -75,6 +65,12 @@ def run_audit():
         instance["average_cpu"] = average_cpu
 
         finding = analyze_ec2_utilization(instance)
+
+        if finding:
+            findings.append(finding)
+            
+    for instance in resources.get("gcp_compute", []):
+        finding = analyze_gcp_compute_instance(instance)
 
         if finding:
             findings.append(finding)

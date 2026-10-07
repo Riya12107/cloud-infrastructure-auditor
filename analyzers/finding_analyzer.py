@@ -68,3 +68,22 @@ def analyze_ec2_utilization(instance):
             "if it is no longer required."
         ),
     )
+def analyze_gcp_compute_instance(instance):
+    status = instance.details.get("status")
+
+    if status not in {"TERMINATED", "STOPPED"}:
+        return None
+
+    return Finding(
+        resource_id=instance.resource_id,
+        resource_type="gcp_compute",
+        title="Stopped GCP Compute instance",
+        severity="medium",
+        description=(
+            f"The GCP Compute instance is currently {status.lower()} "
+            "and may no longer be required."
+        ),
+        recommendation=(
+            "Review the instance and delete it if it is no longer needed."
+        ),
+    )

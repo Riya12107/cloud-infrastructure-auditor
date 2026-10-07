@@ -1,4 +1,5 @@
 from app.audit_engine import run_audit
+from models.resource import CloudResource
 
 
 def test_run_audit_without_credentials():
@@ -12,6 +13,8 @@ def test_run_audit_without_credentials():
     assert "elastic_ips" in result["resources"]
     assert "s3" in result["resources"]
     assert isinstance(result["findings"], list)
+
+
 def test_run_audit_with_gcp_provider(monkeypatch):
     config = {
         "provider": "gcp",
@@ -29,10 +32,16 @@ def test_run_audit_with_gcp_provider(monkeypatch):
     monkeypatch.setattr(
         "app.audit_engine.get_gcp_compute_instances",
         lambda project_id, zone: [
-            {
-                "resource_id": "instance-1",
-                "provider": "gcp",
-            }
+            CloudResource(
+                provider="gcp",
+                resource_type="compute_instance",
+                resource_id="instance-1",
+                details={
+                    "machine_type": "e2-medium",
+                    "status": "TERMINATED",
+                    "zone": "asia-south1-a",
+                },
+            )
         ],
     )
 
@@ -40,3 +49,7 @@ def test_run_audit_with_gcp_provider(monkeypatch):
 
     assert "gcp_compute" in result["resources"]
     assert len(result["resources"]["gcp_compute"]) == 1
+    assert len(result["findings"]) == 1
+    assert result["findings"][0].resource_id == "instance-1"
+    assert result["findings"][0].resource_type == "gcp_compute"
+    assert result["findings"][0].severity == "medium"
