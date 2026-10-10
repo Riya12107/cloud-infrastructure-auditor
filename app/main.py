@@ -1,3 +1,4 @@
+
 import typer
 from rich import print
 
@@ -5,6 +6,8 @@ from utils.logger import get_logger
 from app.audit_engine import run_audit
 from app.report import display_audit_report
 from app.json_report import export_json_report
+from app.cleanup_preview import display_cleanup_preview
+
 app = typer.Typer()
 logger = get_logger()
 
@@ -38,6 +41,15 @@ def audit():
     output_file = export_json_report(result)
     print(f"\n[bold green]JSON report saved to: {output_file}[/bold green]")
 
-    
+
+@app.command("cleanup-preview")
+def cleanup_preview():
+    """Preview recommended cleanup actions without modifying resources."""
+    logger.info("Generating safe cleanup preview")
+
+    result = run_audit()
+    display_cleanup_preview(result.get("findings", []))
+
+
 if __name__ == "__main__":
     app()
