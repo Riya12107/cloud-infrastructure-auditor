@@ -1,3 +1,4 @@
+
 import json
 
 from app.json_report import export_json_report
@@ -17,6 +18,7 @@ def test_export_json_report(tmp_path):
     )
 
     result = {
+        "status": "incomplete",
         "summary": {
             "ec2": 2,
             "ebs": 1,
@@ -24,6 +26,7 @@ def test_export_json_report(tmp_path):
             "s3": 3,
         },
         "findings": [finding],
+        "errors": ["Failed to scan S3: Access denied"],
     }
 
     output_file = tmp_path / "audit_report.json"
@@ -33,8 +36,28 @@ def test_export_json_report(tmp_path):
     with open(output_file, "r", encoding="utf-8") as file:
         data = json.load(file)
 
+    assert data["status"] == "incomplete"
+    assert data["errors"] == ["Failed to scan S3: Access denied"]
     assert data["summary"]["ec2"] == 2
     assert data["summary"]["ebs"] == 1
     assert len(data["findings"]) == 1
     assert data["findings"][0]["resource_id"] == "vol-001"
     assert data["findings"][0]["estimated_monthly_savings"] == 8.0
+
+
+def test_export_json_report_defaults_for_older_results(tmp_path):
+    result = {
+        "summary": {"ec2": 0},
+        "findings": [],
+    }
+
+    output_file = tmp_path / "audit_report.json"
+    export_json_report(result, output_file)
+
+    with open(output_file, "r", encoding="utf-8") as file:
+        data = json.load(file)
+
+    assert data["status"] == "success"
+    assert data["summary"] == {"ec2": 0}
+    assert data["findings"] == []
+    assert data["errors"] == []

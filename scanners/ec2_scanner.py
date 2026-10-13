@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta, timezone
+
 from app.aws_connection import create_aws_session
 
 
@@ -8,7 +10,6 @@ def get_ec2_instances():
         return []
 
     ec2 = session.client("ec2")
-
     response = ec2.describe_instances()
 
     instances = []
@@ -58,10 +59,13 @@ def get_cpu_utilizations(instance_ids, cloudwatch_client=None):
             "ReturnData": True,
         })
 
+    end_time = datetime.now(timezone.utc)
+    start_time = end_time - timedelta(hours=24)
+
     response = cloudwatch_client.get_metric_data(
         MetricDataQueries=metric_queries,
-        StartTime=None,
-        EndTime=None,
+        StartTime=start_time,
+        EndTime=end_time,
     )
 
     results = {}
