@@ -1,14 +1,22 @@
+
 import boto3
 from botocore.exceptions import NoCredentialsError
 
+from app.config_loader import load_config
 from utils.logger import get_logger
 
 logger = get_logger()
 
 
-def create_aws_session():
+def create_aws_session(region_name=None):
+    """Create an AWS session using the requested or configured region."""
+
     try:
-        session = boto3.Session()
+        if region_name is None:
+            config = load_config()
+            region_name = config.get("region") if config else None
+
+        session = boto3.Session(region_name=region_name)
 
         credentials = session.get_credentials()
 
@@ -16,7 +24,10 @@ def create_aws_session():
             logger.error("AWS credentials were not found.")
             return None
 
-        logger.info("AWS session created successfully.")
+        logger.info(
+            "AWS session created successfully in region %s.",
+            session.region_name,
+        )
         return session
 
     except NoCredentialsError:

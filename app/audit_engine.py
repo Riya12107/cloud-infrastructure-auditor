@@ -55,7 +55,7 @@ def run_audit():
         }
 
         # Stop early when AWS credentials are unavailable.
-        if create_aws_session() is None:
+        if create_aws_session(region_name=config.get("region")) is None:
             empty_result["resources"] = resources
             empty_result["summary"] = {
                 resource_type: 0
