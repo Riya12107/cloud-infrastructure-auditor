@@ -12,7 +12,7 @@ def test_version():
     result = runner.invoke(app, ["version"])
 
     assert result.exit_code == 0
-    assert "v0.1.0" in result.stdout
+    assert "v1.0.0" in result.stdout
 
 
 @patch("src.cli.main.ScannerManager")

@@ -399,7 +399,7 @@ def version():
     """
 
     console.print(
-        "Cloud Infrastructure Auditor v0.1.0"
+        "Cloud Infrastructure Auditor v1.0.0"
     )
 
 
